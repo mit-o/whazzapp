@@ -1,8 +1,61 @@
-import Head from "next/head";
+import { useState, useEffect, useContext } from "react";
+import useWebSocket, { ReadyState } from "react-use-websocket";
+import { WS_BASE_URL } from "../utils/api";
+import { useRouter } from "next/router";
+import AuthContext from "../context/AuthContext";
 import ChatScreen from "../components/chat/ChatScreen";
 import Sidebar from "../components/sidebar/Sidebar";
+import Head from "next/head";
 
 const Home = () => {
+  const router = useRouter();
+
+  const [welcomeMessage, setWelcomeMessage] = useState("");
+  const [messageHistory, setMessageHistory] = useState([]);
+  const { authTokens, user } = useContext(AuthContext);
+  const { readyState, sendJsonMessage } = useWebSocket(
+    user ? WS_BASE_URL : null,
+    {
+      queryParams: {
+        token: authTokens ? authTokens.access : null,
+      },
+      onOpen: () => {
+        console.log("Connected!");
+      },
+      onClose: () => {
+        console.log("Disconnected!");
+      },
+      onMessage: (e) => {
+        const data = JSON.parse(e.data);
+        switch (data.type) {
+          case "welcome_message":
+            setWelcomeMessage(data.message);
+            break;
+          case "chat_message_echo":
+            setMessageHistory((prev) => prev.concat(data));
+            break;
+          default:
+            console.error("Unknown message type!");
+            break;
+        }
+      },
+    }
+  );
+
+  const connectionStatus = {
+    [ReadyState.CONNECTING]: "Connecting",
+    [ReadyState.OPEN]: "Connected",
+    [ReadyState.CLOSING]: "Closing",
+    [ReadyState.CLOSED]: "Closed",
+    [ReadyState.UNINSTANTIATED]: "Uninstantiated",
+  }[readyState];
+
+  useEffect(() => {
+    if (!user) {
+      router.push("/login");
+    }
+  }, [user]);
+
   return (
     <>
       <Head>
@@ -30,7 +83,10 @@ const Home = () => {
       </Head>
       <main className="flex">
         <Sidebar />
-        <ChatScreen />
+        <ChatScreen
+          sendMessage={sendJsonMessage}
+          messageHistory={messageHistory}
+        />
       </main>
     </>
   );

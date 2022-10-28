@@ -1,7 +1,7 @@
-const Message = ({ msg }) => {
+const Message = ({ name, msg }) => {
   return (
     <div className="m-5 w-fit h-fit text-stone-100">
-      <p className="pb-2 font-semibold">Janusz</p>
+      <p className="pb-2 font-semibold">{name}</p>
       <div className="flex gap-5 p-5 bg-secondary rounde items-center">
         <p>{msg}</p>
         <p className="text-sm text-gray-400 font-semibold">

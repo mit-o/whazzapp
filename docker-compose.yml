@@ -79,7 +79,6 @@ services:
 volumes:
   client:
   backend:
-  # daphne:
   worker:
   pgdata:
   redisdata:
