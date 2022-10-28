@@ -41,7 +41,7 @@ class ChatConsumer(JsonWebsocketConsumer):
                 self.room_name,
                 {
                     "type": "chat_message_echo",
-                    "name": content["name"],
+                    "name": self.user.email,
                     "message": content["message"],
                 },
             )
