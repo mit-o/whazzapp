@@ -1,10 +1,36 @@
-import { useContext } from "react";
-import AuthContext from "../context/AuthContext";
 import Head from "next/head";
 import Link from "next/link";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/router";
+import { useSelector, useDispatch } from "react-redux";
+import { register } from "../features/authSlice";
 
-const Login = () => {
-  const { registerUser } = useContext(AuthContext);
+const Register = () => {
+  const dispatch = useDispatch();
+  const { registered } = useSelector((state) => state.auth);
+  const router = useRouter();
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const { email, password } = formData;
+
+  const onChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+    dispatch(register(formData));
+  };
+
+  useEffect(() => {
+    if (registered) {
+      router.push("/login");
+    }
+  }, [registered]);
 
   return (
     <>
@@ -34,7 +60,7 @@ const Login = () => {
       <main className="flex items-center justify-center bg-primary">
         <div className="w-3/5 h-2/3 bg-secondary rounded">
           <form
-            onSubmit={registerUser}
+            onSubmit={onSubmit}
             className="flex flex-col items-center justify-center h-full gap-5"
           >
             <input
@@ -42,24 +68,18 @@ const Login = () => {
               name="email"
               placeholder="email"
               className="w-fit p-3"
+              onChange={onChange}
+              value={email}
+              required
             />
             <input
               type="password"
               name="password"
               placeholder="password"
               className="w-fit p-3"
-            />
-            <input
-              type="text"
-              name="firstName"
-              placeholder="First name"
-              className="w-fit p-3"
-            />
-            <input
-              type="text"
-              name="lastName"
-              placeholder="Last name"
-              className="w-fit p-3"
+              onChange={onChange}
+              value={password}
+              required
             />
             <button type="submit" className="text-stone-100">
               Register
@@ -74,4 +94,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

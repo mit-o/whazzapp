@@ -1,29 +1,31 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import useWebSocket, { ReadyState } from "react-use-websocket";
 import { WS_BASE_URL } from "../utils/api";
 import { useRouter } from "next/router";
-import AuthContext from "../context/AuthContext";
+import Head from "next/head";
+import { useSelector } from "react-redux";
 import ChatScreen from "../components/chat/ChatScreen";
 import Sidebar from "../components/sidebar/Sidebar";
-import Head from "next/head";
 
 const Home = () => {
+  const { isAuthenticated, tokens } = useSelector((state) => state.auth);
   const router = useRouter();
-
+  const { chat } = router.query;
   const [welcomeMessage, setWelcomeMessage] = useState("");
   const [messageHistory, setMessageHistory] = useState([]);
-  const { authTokens, user } = useContext(AuthContext);
   const { readyState, sendJsonMessage } = useWebSocket(
-    user ? WS_BASE_URL : null,
+    isAuthenticated && chat ? `${WS_BASE_URL}/${chat}/` : null,
     {
       queryParams: {
-        token: authTokens ? authTokens.access : null,
+        token: tokens ? tokens.access : null,
       },
       onOpen: () => {
         console.log("Connected!");
+        return;
       },
       onClose: () => {
         console.log("Disconnected!");
+        return;
       },
       onMessage: (e) => {
         const data = JSON.parse(e.data);
@@ -32,7 +34,10 @@ const Home = () => {
             setWelcomeMessage(data.message);
             break;
           case "chat_message_echo":
-            setMessageHistory((prev) => prev.concat(data));
+            setMessageHistory((prev) => prev.concat(data.message));
+            break;
+          case "last_50_messages":
+            setMessageHistory(data.messages.reverse());
             break;
           default:
             console.error("Unknown message type!");
@@ -51,11 +56,10 @@ const Home = () => {
   }[readyState];
 
   useEffect(() => {
-    if (!user) {
+    if (!isAuthenticated) {
       router.push("/login");
     }
-  }, [user]);
-
+  }, [isAuthenticated]);
   return (
     <>
       <Head>
