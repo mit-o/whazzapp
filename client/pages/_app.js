@@ -1,7 +1,22 @@
-import '../styles/globals.css'
+import dynamic from "next/dynamic";
+import { store } from "../store";
+import { Provider } from "react-redux";
+import { persistStore } from "redux-persist";
+import { PersistGate } from "redux-persist/integration/react";
+import "../styles/globals.css";
 
-function MyApp({ Component, pageProps }) {
-  return <Component {...pageProps} />
-}
+let persistor = persistStore(store);
 
-export default MyApp
+const App = ({ Component, pageProps }) => {
+  return (
+    <Provider store={store}>
+      <PersistGate persistor={persistor}>
+        <Component {...pageProps} />
+      </PersistGate>
+    </Provider>
+  );
+};
+
+export default dynamic(() => Promise.resolve(App), {
+  ssr: false,
+});

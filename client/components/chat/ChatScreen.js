@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   BsThreeDotsVertical,
   BsSearch,
@@ -10,17 +10,41 @@ import Image from "next/image";
 import Dropdown from "../Dropdown";
 import Message from "./Message";
 
-const ChatScreen = () => {
+const ChatScreen = ({ messageHistory, sendMessage }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [message, setMessage] = useState("");
+  const messageRef = useRef(null);
 
   const openDropdownHandler = () => {
     setIsDropdownOpen((prevState) => !prevState);
   };
 
+  const handleChangeMessage = (e) => {
+    setMessage(e.target.value);
+  };
+
+  const onKeyUpHandler = (e) => {
+    if (e.key === "Enter" || e.key === "NumpadEnter") {
+      sendMessageHandler(e);
+    }
+  };
+
   const sendMessageHandler = async (e) => {
     e.preventDefault();
-    console.log("x");
+    sendMessage({
+      type: "chat_message",
+      message,
+    });
+    setMessage("");
   };
+
+  useEffect(() => {
+    if (messageRef && messageRef.current) {
+      messageRef.current.style.height = "0px";
+      const scrollHeight = messageRef.current.scrollHeight;
+      messageRef.current.style.height = scrollHeight + "px";
+    }
+  }, [message]);
 
   return (
     <div className="flex flex-col w-full lg:w-[calc(100%-400px)] h-full bg-primary self-end">
@@ -33,11 +57,11 @@ const ChatScreen = () => {
               width="100%"
               height="100%"
               className="rounded-full object-cover"
-              src="/avatar.jpeg"
+              src="/avatar.png"
             />
           </div>
           <div>
-            <p className="text-base font-semibold">Janusz</p>
+            <p className="text-base font-semibold">xxx</p>
             <p className="text-sm text-gray-400">last seen today at 12:40 am</p>
           </div>
         </div>
@@ -62,13 +86,14 @@ const ChatScreen = () => {
       </div>
 
       {/* messages */}
-      <div className="flex flex-col grow w-full p-5 gap-2.5">
-        <Message msg="reee" />
-        <Message msg="30$ i jestem dzisiaj" />
+      <div className="flex flex-col grow w-full p-5 gap-2.5 overflow-y-auto">
+        {messageHistory.map((message) => (
+          <Message key={message.id} message={message} />
+        ))}
       </div>
 
       {/* input */}
-      <div className="flex p-5 h-20 w-full bg-secondary text-stone-100 items-center">
+      <div className="flex p-5 w-full bg-secondary text-stone-100 items-center">
         <div className="flex space-x-2.5">
           <div className="p-2 rounded-full cursor-pointer">
             <span className="text-2xl">
@@ -82,13 +107,18 @@ const ChatScreen = () => {
           </div>
         </div>
         <form
-          className="grow m-5 bg-primary opacity-70 rounded"
+          className="flex grow mx-5 max-h-32 bg-primary opacity-70 rounded"
           onSubmit={sendMessageHandler}
+          onKeyUp={onKeyUpHandler}
         >
-          <input
-            className="shadow p-3 appearance-none text-stone-100 bg-transparent focus:outline-none focus:shadow-outline"
+          <textarea
+            className="grow max-h-32 shadow p-3 appearance-none text-stone-100 bg-transparent outline-none focus:outline-none focus:shadow-outline"
             placeholder="Type a message"
+            name="message"
+            ref={messageRef}
             type="text"
+            value={message}
+            onChange={handleChangeMessage}
           />
           <button
             type="submit"

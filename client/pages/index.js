@@ -1,8 +1,65 @@
+import { useState, useEffect } from "react";
+import useWebSocket, { ReadyState } from "react-use-websocket";
+import { WS_BASE_URL } from "../utils/api";
+import { useRouter } from "next/router";
 import Head from "next/head";
+import { useSelector } from "react-redux";
 import ChatScreen from "../components/chat/ChatScreen";
 import Sidebar from "../components/sidebar/Sidebar";
 
 const Home = () => {
+  const { isAuthenticated, tokens } = useSelector((state) => state.auth);
+  const router = useRouter();
+  const { chat } = router.query;
+  const [welcomeMessage, setWelcomeMessage] = useState("");
+  const [messageHistory, setMessageHistory] = useState([]);
+  const { readyState, sendJsonMessage } = useWebSocket(
+    isAuthenticated && chat ? `${WS_BASE_URL}/${chat}/` : null,
+    {
+      queryParams: {
+        token: tokens ? tokens.access : null,
+      },
+      onOpen: () => {
+        console.log("Connected!");
+        return;
+      },
+      onClose: () => {
+        console.log("Disconnected!");
+        return;
+      },
+      onMessage: (e) => {
+        const data = JSON.parse(e.data);
+        switch (data.type) {
+          case "welcome_message":
+            setWelcomeMessage(data.message);
+            break;
+          case "chat_message_echo":
+            setMessageHistory((prev) => prev.concat(data.message));
+            break;
+          case "last_50_messages":
+            setMessageHistory(data.messages.reverse());
+            break;
+          default:
+            console.error("Unknown message type!");
+            break;
+        }
+      },
+    }
+  );
+
+  const connectionStatus = {
+    [ReadyState.CONNECTING]: "Connecting",
+    [ReadyState.OPEN]: "Connected",
+    [ReadyState.CLOSING]: "Closing",
+    [ReadyState.CLOSED]: "Closed",
+    [ReadyState.UNINSTANTIATED]: "Uninstantiated",
+  }[readyState];
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated]);
   return (
     <>
       <Head>
@@ -30,7 +87,10 @@ const Home = () => {
       </Head>
       <main className="flex">
         <Sidebar />
-        <ChatScreen />
+        <ChatScreen
+          sendMessage={sendJsonMessage}
+          messageHistory={messageHistory}
+        />
       </main>
     </>
   );
