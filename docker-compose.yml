@@ -6,8 +6,6 @@ services:
     build:
       context: ./client
       dockerfile: Dockerfile
-    environment:
-      - NODE_ENV
     volumes:
     - ./client/:/usr/src/app/
     ports:
@@ -19,7 +17,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    command: sh -c "python3 manage.py makemigrations && python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8000"
+    command: sh -c "python3 manage.py migrate && python3 manage.py runserver 0.0.0.0:8000"
     environment:
       - SECRET_KEY
       - DB_ENGINE
@@ -81,6 +79,7 @@ services:
 volumes:
   client:
   backend:
+  # daphne:
   worker:
   pgdata:
   redisdata:

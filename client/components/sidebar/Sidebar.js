@@ -4,7 +4,7 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import Image from "next/image";
 import Dropdown from "../Dropdown";
 import Searchbar from "./Searchbar";
-import ContactList from "./Conversations";
+import ContactList from "./ContactList";
 
 const Sidebar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -47,7 +47,7 @@ const Sidebar = () => {
             width="100%"
             height="100%"
             className="rounded-full object-cover"
-            src="/avatar.jpeg"
+            src="/me.jpeg"
           />
         </div>
         <div className="flex space-x-2.5">
