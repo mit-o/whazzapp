@@ -23,6 +23,12 @@ const ChatScreen = ({ messageHistory, sendMessage }) => {
     setMessage(e.target.value);
   };
 
+  const onKeyUpHandler = (e) => {
+    if (e.key === "Enter" || e.key === "NumpadEnter") {
+      sendMessageHandler(e);
+    }
+  };
+
   const sendMessageHandler = async (e) => {
     e.preventDefault();
     sendMessage({
@@ -51,7 +57,7 @@ const ChatScreen = ({ messageHistory, sendMessage }) => {
               width="100%"
               height="100%"
               className="rounded-full object-cover"
-              src="/avatar.jpeg"
+              src="/avatar.png"
             />
           </div>
           <div>
@@ -80,9 +86,9 @@ const ChatScreen = ({ messageHistory, sendMessage }) => {
       </div>
 
       {/* messages */}
-      <div className="flex flex-col grow w-full p-5 gap-2.5">
-        {messageHistory?.map((message, idx) => (
-          <Message key={idx} msg={message.message} name={message.name} />
+      <div className="flex flex-col grow w-full p-5 gap-2.5 overflow-y-auto">
+        {messageHistory.map((message) => (
+          <Message key={message.id} message={message} />
         ))}
       </div>
 
@@ -103,6 +109,7 @@ const ChatScreen = ({ messageHistory, sendMessage }) => {
         <form
           className="flex grow mx-5 max-h-32 bg-primary opacity-70 rounded"
           onSubmit={sendMessageHandler}
+          onKeyUp={onKeyUpHandler}
         >
           <textarea
             className="grow max-h-32 shadow p-3 appearance-none text-stone-100 bg-transparent outline-none focus:outline-none focus:shadow-outline"

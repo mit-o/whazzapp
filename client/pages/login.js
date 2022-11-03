@@ -1,10 +1,42 @@
-import { useContext } from "react";
+import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { resetRegistered, login } from "../features/authSlice";
 import Head from "next/head";
 import Link from "next/link";
-import AuthContext from "../context/AuthContext";
+import { useRouter } from "next/router";
 
 const Login = () => {
-  const { loginUser } = useContext(AuthContext);
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const { isAuthenticated } = useSelector((state) => state.auth);
+
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
+  const { email, password } = formData;
+
+  const onChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const onSubmit = (e) => {
+    e.preventDefault();
+
+    dispatch(login(formData));
+  };
+
+  useEffect(() => {
+    if (dispatch && dispatch !== null && dispatch !== undefined)
+      dispatch(resetRegistered());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/");
+    }
+  }, [isAuthenticated]);
 
   return (
     <>
@@ -34,7 +66,7 @@ const Login = () => {
       <main className="flex items-center justify-center bg-primary">
         <div className="w-3/5 h-2/3 bg-secondary rounded">
           <form
-            onSubmit={loginUser}
+            onSubmit={onSubmit}
             className="flex flex-col items-center justify-center h-full gap-5"
           >
             <input
@@ -42,19 +74,23 @@ const Login = () => {
               placeholder="email"
               className="w-fit p-3"
               name="email"
+              value={email}
+              onChange={onChange}
             />
             <input
               type="password"
               placeholder="password"
               className="w-fit p-3"
               name="password"
+              value={password}
+              onChange={onChange}
             />
             <button type="submit" className="text-stone-100">
               Log In
             </button>
           </form>
           <Link href="/register">
-            <a>Register</a>
+            <a className="text-stone-400">Register</a>
           </Link>
         </div>
       </main>
