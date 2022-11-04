@@ -13,29 +13,26 @@ const Conversations = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    try {
-      const fetchUsers = async () => {
-        const res = await fetch(`${API_BASE_URL}/users/all/`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        const data = await res.json();
+    const fetchUsers = async () => {
+      const res = await fetch(`${API_BASE_URL}/users/all/`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      const data = await res.json();
 
-        if (res.status === 200) {
-          setUsers(data);
-        } else if (res.status === 401) {
-          dispatch(refreshToken());
-          fetchUsers();
-        } else {
-          setError("Couldn't fetch users");
-        }
-      };
-    } catch (err) {
-      console.log(err);
-      setError("Couldn't fetch users");
-    }
-  }, [user]);
+      if (res.status === 200) {
+        setUsers(data);
+      } else if (res.status === 401) {
+        dispatch(refreshToken());
+        fetchUsers();
+      } else {
+        setError("Couldn't fetch users");
+      }
+    };
+
+    fetchUsers();
+  }, []);
 
   const collectConversationSlug = (u) => {
     const namesAlph = [user?.id, u.id].sort();
