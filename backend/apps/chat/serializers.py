@@ -1,6 +1,29 @@
 from rest_framework import serializers
-from .models import Message
+from .models import Message, Conversation
 from apps.accounts.serializers import UserSerializer
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+
+class ConversationSerializer(serializers.ModelSerializer):
+    last_message = serializers.SerializerMethodField()
+    participants = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Conversation
+        fields = ("id", "name", "users", "participants", "last_message")
+        extra_kwargs = {"users": {"write_only": True}}
+
+    def get_last_message(self, obj):
+        messages = obj.messages.all().order_by("-timestamp")
+        if not messages.exists():
+            return None
+        message = messages[0]
+        return MessageSerializer(message).data
+
+    def get_participants(self, obj):
+        return [UserSerializer(user).data for user in obj.users.all()]
 
 
 class MessageSerializer(serializers.ModelSerializer):
