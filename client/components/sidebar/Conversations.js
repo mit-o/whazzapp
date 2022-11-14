@@ -1,64 +1,49 @@
 import { useState, useEffect } from "react";
 import { API_BASE_URL } from "/utils/api";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import Conversation from "./Conversation";
 import Link from "next/link";
-import { refreshToken } from "../../features/authSlice";
 
 const Conversations = () => {
   const { user, tokens } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
   const accessToken = tokens?.access;
-  const [users, setUsers] = useState([]);
-  const [error, setError] = useState("");
+  const [activeConversations, setActiveConversations] = useState();
 
   useEffect(() => {
-    const fetchUsers = async () => {
-      const res = await fetch(`${API_BASE_URL}/users/all/`, {
+    const fetchActiveConversations = async () => {
+      const res = await fetch(`${API_BASE_URL}/conversations/`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
       });
       const data = await res.json();
 
-      if (res.status === 200) {
-        setUsers(data);
-      } else if (res.status === 401) {
-        dispatch(refreshToken());
-        fetchUsers();
-      } else {
-        setError("Couldn't fetch users");
-      }
+      setActiveConversations(data);
     };
 
-    fetchUsers();
-  }, []);
-
-  const collectConversationSlug = (u) => {
-    const namesAlph = [user?.id, u.id].sort();
-    return namesAlph.join("__");
-  };
+    fetchActiveConversations();
+  }, [user]);
 
   return (
     <>
       <div className="flex flex-col py-3 text-base overflow-y-scroll scrollbar">
-        {users
-          ?.filter((u) => u.id !== user?.id)
-          .map((u) => (
-            <Link
-              key={u.id}
-              href={{
-                pathname: "/",
-                query: { chat: collectConversationSlug(u) },
-              }}
-              as={"/"}
-            >
-              <a>
-                <Conversation receiver={u} />
-              </a>
-            </Link>
-          ))}
-        {error && <p>{error}</p>}
+        {activeConversations?.map((conversation) => (
+          <Link
+            key={conversation.id}
+            href={{
+              pathname: "/",
+              query: { conversationId: conversation.id },
+            }}
+            as={"/"}
+          >
+            <a>
+              <Conversation
+                participants={conversation.participants}
+                lastMessage={conversation.last_message}
+              />
+            </a>
+          </Link>
+        ))}
       </div>
       <style jsx>
         {`

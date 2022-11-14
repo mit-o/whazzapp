@@ -10,11 +10,13 @@ import Sidebar from "../components/sidebar/Sidebar";
 const Home = () => {
   const { isAuthenticated, tokens } = useSelector((state) => state.auth);
   const router = useRouter();
-  const { chat } = router.query;
+  const { conversationId } = router.query;
   const [welcomeMessage, setWelcomeMessage] = useState("");
   const [messageHistory, setMessageHistory] = useState([]);
   const { readyState, sendJsonMessage } = useWebSocket(
-    isAuthenticated && chat ? `${WS_BASE_URL}/${chat}/` : null,
+    isAuthenticated && conversationId
+      ? `${WS_BASE_URL}/${conversationId}/`
+      : null,
     {
       queryParams: {
         token: tokens ? tokens.access : null,
