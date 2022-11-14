@@ -26,7 +26,7 @@ class ChatConsumer(JsonWebsocketConsumer):
     def __init__(self, *args, **kwargs):
         super().__init__(args, kwargs)
         self.user = None
-        self.conversation_name = None
+        self.conversation_id = None
         self.conversation = None
 
     def connect(self):
@@ -35,16 +35,11 @@ class ChatConsumer(JsonWebsocketConsumer):
             return
 
         self.accept()
-        self.conversation_name = (
-            f"{self.scope['url_route']['kwargs']['conversation_name']}"
-        )
-        self.conversation, created = Conversation.objects.get_or_create(
-            name=self.conversation_name
-        )
 
+        self.conversation_id = f"{self.scope['url_route']['kwargs']['conversation_id']}"
+        self.conversation = Conversation.objects.get(id=self.conversation_id)
         async_to_sync(self.channel_layer.group_add)(
-            self.conversation_name,
-            self.channel_name,
+            self.conversation_id, self.channel_name
         )
         self.send_json(
             {
@@ -76,7 +71,7 @@ class ChatConsumer(JsonWebsocketConsumer):
             )
 
             async_to_sync(self.channel_layer.group_send)(
-                self.conversation_name,
+                self.conversation_id,
                 {
                     "type": "chat_message_echo",
                     "name": self.user.email,
@@ -87,7 +82,7 @@ class ChatConsumer(JsonWebsocketConsumer):
         return super().receive_json(content, **kwargs)
 
     def get_receiver(self):
-        ids = self.conversation_name.split("__")
+        ids = self.conversation.users.values_list("id", flat=True)
         for id in ids:
             if id != self.user.id:
                 return User.objects.get(id=id)
