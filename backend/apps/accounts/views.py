@@ -29,6 +29,7 @@ class RegisterView(generics.CreateAPIView):
 
 class UserViewSet(RetrieveModelMixin, ListModelMixin, GenericViewSet):
     queryset = User.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
 
     @action(detail=False)
     def all(self, request):
