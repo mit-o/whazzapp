@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -37,16 +38,26 @@ class UserSerializer(serializers.ModelSerializer):
 
 class RegisterSerializer(serializers.ModelSerializer):
     tokens = serializers.SerializerMethodField()
+    confirm_password = serializers.CharField(
+        style={"input_type": "password"}, write_only=True
+    )
 
     class Meta:
         model = User
-        fields = ("email", "password", "first_name", "last_name", "tokens")
+        fields = ("email", "password", "confirm_password", "tokens")
 
         extra_kwargs = {
             "password": {"write_only": True},
-            "first_name": {"required": False},
-            "last_name": {"required": False},
         }
+
+    def validate(self, data):
+        password = data.get("password")
+        confirm_password = data.pop("confirm_password")
+        if password != confirm_password:
+            raise ValidationError(
+                {"password": "Your password and confirmation password do not match."}
+            )
+        return data
 
     def get_tokens(self, user):
         tokens = RefreshToken.for_user(user)

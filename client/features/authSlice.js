@@ -3,10 +3,11 @@ import { API_BASE_URL } from "../utils/api";
 
 export const register = createAsyncThunk(
   "auth/register",
-  async ({ email, password }, thunkAPI) => {
+  async ({ email, password, confirmPassword }, thunkAPI) => {
     const body = JSON.stringify({
-      email,
-      password,
+      email: email,
+      password: password,
+      confirm_password: confirmPassword,
     });
 
     try {
