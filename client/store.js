@@ -1,5 +1,4 @@
-import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "./features/authSlice";
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
 import storage from "redux-persist/lib/storage";
 import {
   persistReducer,
@@ -10,7 +9,9 @@ import {
   PURGE,
   REGISTER,
 } from "redux-persist";
-import { combineReducers } from "@reduxjs/toolkit";
+import authReducer from "./features/authSlice";
+import chatReducer from "./features/chatSlice";
+
 
 const persistConfig = {
   key: "root",
@@ -19,6 +20,7 @@ const persistConfig = {
 
 const reducer = combineReducers({
   auth: persistReducer(persistConfig, authReducer),
+  chat: chatReducer,
 });
 
 export const store = configureStore({
