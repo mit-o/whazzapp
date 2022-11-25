@@ -11,7 +11,7 @@ const Message = ({ message }) => {
 
   return (
     <div
-      className={`mx-10 my-5 w-fit h-fit text-stone-100 max-w-[50%] ${
+      className={`mx-10 my-2 w-fit h-fit text-stone-100 max-w-[50%] ${
         isSender ? "self-end" : null
       }`}
     >
@@ -19,12 +19,12 @@ const Message = ({ message }) => {
         {isSender ? null : message.sender.email}
       </p>
       <div
-        className={`flex gap-5 p-5 bg-secondary rounded items-center ${
-          isSender ? "bg-teal-900" : "bg-secondary"
+        className={`flex gap-5 px-5 py-3 bg-secondary rounded items-center ${
+          isSender ? "bg-teal-700" : "bg-secondary"
         }`}
       >
-        <p className="break-all">{message.content}</p>
-        <p className="text-sm text-gray-400 font-semibold">
+        <p className="break-all font-medium">{message.content}</p>
+        <p className="text-sm font-medium text-primary">
           {formatTime(message.timestamp)}
         </p>
       </div>
