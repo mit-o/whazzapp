@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import Image from "next/image";
 
-const Conversation = ({ participants, lastMessage }) => {
+const Conversation = ({ click, participants, lastMessage }) => {
   const { user } = useSelector((state) => state.auth);
   const receiver = participants.filter(
     (participant) => participant.id !== user.id
@@ -13,7 +13,10 @@ const Conversation = ({ participants, lastMessage }) => {
   };
 
   return (
-    <div className="flex flex-row items-center cursor-pointer px-5 py-3 gap-x-5 hover:bg-secondary">
+    <div
+      className="flex flex-row items-center cursor-pointer px-5 py-3 gap-x-5 hover:bg-secondary"
+      onClick={click}
+    >
       <div className="w-14 h-14 rounded-full">
         <Image
           src="/avatar.png"
