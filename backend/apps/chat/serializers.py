@@ -26,6 +26,13 @@ class ConversationSerializer(serializers.ModelSerializer):
         return [UserSerializer(user).data for user in obj.users.all()]
 
 
+class createConversationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Conversation
+        fields = ("name", "users")
+        extra_kwargs = {"users": {"write_only": True}}
+
+
 class MessageSerializer(serializers.ModelSerializer):
     sender = serializers.SerializerMethodField()
     receiver = serializers.SerializerMethodField()
