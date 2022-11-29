@@ -1,4 +1,3 @@
-import dynamic from "next/dynamic";
 import { store } from "../store";
 import { Provider } from "react-redux";
 import { persistStore } from "redux-persist";
@@ -17,6 +16,4 @@ const App = ({ Component, pageProps }) => {
   );
 };
 
-export default dynamic(() => Promise.resolve(App), {
-  ssr: false,
-});
+export default App;

@@ -10,7 +10,7 @@
   <h3 align="center">Whazzapp - Real time Chat application</h3>
 
   <p align="center">
-    Built in with Django Channels and Next.js!
+    Built in with DRF, Django Channels and Next.js!
     <br />
   </p>
 </div>
@@ -71,7 +71,7 @@ This is an example of how you may give instructions on setting up your project l
 
 ### Prerequisites
 
-First of all to start you will need to have docker on your machine.
+First of all to start you will need to have docker with docker-compose on your machine.
 
 ### Installation
 

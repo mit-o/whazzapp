@@ -4,12 +4,31 @@ import { BsThreeDotsVertical } from "react-icons/bs";
 import Image from "next/image";
 import Dropdown from "../Dropdown";
 import Searchbar from "./Searchbar";
-import ContactList from "./Conversations";
-
+import Conversations from "./Conversations";
+import { useDispatch } from "react-redux";
+import { logout } from "../../features/authSlice";
 const Sidebar = () => {
+  const dispatch = useDispatch();
+
+  const actions = [
+    {
+      action: "New group",
+      func: () => console.log("New group"),
+    },
+    {
+      action: "Settings",
+      func: () => console.log("Settings"),
+    },
+    {
+      action: "Logout",
+      func: () => dispatch(logout()),
+    },
+  ];
+
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [newConversation, setNewConversation] = useState(false);
 
   const detectMobileScreen = useCallback(() => {
     const isActive = window.innerWidth < 1024;
@@ -51,7 +70,10 @@ const Sidebar = () => {
           />
         </div>
         <div className="flex space-x-2.5">
-          <div className="p-2 rounded-full cursor-pointer">
+          <div
+            className="p-2 rounded-full cursor-pointer"
+            onClick={() => setNewConversation(true)}
+          >
             <span className="text-2xl">
               <MdMessage />
             </span>
@@ -65,13 +87,13 @@ const Sidebar = () => {
             <span className="text-2xl">
               <BsThreeDotsVertical />
             </span>
-            <Dropdown isOpen={isDropdownOpen} />
+            <Dropdown actions={actions} isOpen={isDropdownOpen} />
           </div>
         </div>
       </div>
 
       {/* <Searchbar /> */}
-      <ContactList />
+      {newConversation ? <UsersList /> : <Conversations />}
 
       {isMobile && (
         <span

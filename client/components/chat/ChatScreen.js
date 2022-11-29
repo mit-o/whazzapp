@@ -9,8 +9,11 @@ import {
 import Image from "next/image";
 import Dropdown from "../Dropdown";
 import Message from "./Message";
+import { useSelector } from "react-redux";
+import { selectActiveChat } from "../../features/chatSlice";
 
 const ChatScreen = ({ messageHistory, sendMessage }) => {
+  const activeChat = useSelector(selectActiveChat);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [message, setMessage] = useState("");
   const messageRef = useRef(null);
@@ -61,7 +64,7 @@ const ChatScreen = ({ messageHistory, sendMessage }) => {
             />
           </div>
           <div>
-            <p className="text-base font-semibold">xxx</p>
+            <p className="text-base font-semibold">{activeChat.name || ""}</p>
             <p className="text-sm text-gray-400">last seen today at 12:40 am</p>
           </div>
         </div>
@@ -80,7 +83,7 @@ const ChatScreen = ({ messageHistory, sendMessage }) => {
             <span className="text-2xl">
               <BsThreeDotsVertical />
             </span>
-            <Dropdown isOpen={isDropdownOpen} />
+            <Dropdown actions={[]} isOpen={isDropdownOpen} />
           </div>
         </div>
       </div>
@@ -122,7 +125,7 @@ const ChatScreen = ({ messageHistory, sendMessage }) => {
           />
           <button
             type="submit"
-            className="border rounded bg-stone-100 p-3 text-primary"
+            className="border rounded border-transparent bg-teal-300 p-3 text-primary font-medium hover:bg-teal-400"
           >
             Send
           </button>

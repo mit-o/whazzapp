@@ -1,22 +1,17 @@
-import { useDispatch } from "react-redux";
-import { logout } from "../features/authSlice";
-const listItems = ["New group", "Settings", "Logout"];
-
-const Dropdown = ({ isOpen }) => {
-  const dispatch = useDispatch();
+const Dropdown = ({ actions, isOpen }) => {
   return (
     <ul
       className={`absolute top-10 right-0 p-2 bg-dropdown shadow-lg ${
         isOpen ? "flex flex-col" : "hidden"
       }`}
     >
-      {listItems.map((el, idx) => (
+      {actions?.map(({ action, func }) => (
         <li
-          key={idx}
+          key={action}
           className="py-3 px-8 w-full whitespace-nowrap text-elipsis hover:bg-primary"
-          onClick={el === "Logout" ? () => dispatch(logout()) : null}
+          onClick={func}
         >
-          {el}
+          {action}
         </li>
       ))}
     </ul>

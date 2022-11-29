@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { API_BASE_URL } from "/utils/api";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { setActiveChat } from "../../features/chatSlice";
 import Conversation from "./Conversation";
-import Link from "next/link";
 
 const Conversations = () => {
+  const dispatch = useDispatch();
   const { user, tokens } = useSelector((state) => state.auth);
   const accessToken = tokens?.access;
   const [activeConversations, setActiveConversations] = useState();
@@ -28,21 +29,12 @@ const Conversations = () => {
     <>
       <div className="flex flex-col py-3 text-base overflow-y-scroll scrollbar">
         {activeConversations?.map((conversation) => (
-          <Link
+          <Conversation
             key={conversation.id}
-            href={{
-              pathname: "/",
-              query: { conversationId: conversation.id },
-            }}
-            as={"/"}
-          >
-            <a>
-              <Conversation
-                participants={conversation.participants}
-                lastMessage={conversation.last_message}
-              />
-            </a>
-          </Link>
+            click={() => dispatch(setActiveChat(conversation))}
+            participants={conversation.participants}
+            lastMessage={conversation.last_message}
+          />
         ))}
       </div>
       <style jsx>
