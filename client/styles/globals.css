@@ -13,3 +13,23 @@ div#__next {
 main {
   @apply h-full;
 }
+
+@layer components {
+  .scrollbar::-webkit-scrollbar {
+    @apply w-2;
+  }
+
+  .scrollbar::-webkit-scrollbar-track {
+    @apply bg-[#233138];
+    @apply rounded-lg;
+  }
+
+  .scrollbar::-webkit-thumb {
+    @apply bg-[#121b21];
+    @apply rounded-lg;
+  }
+
+  .scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-[#121b21];
+  }
+}
