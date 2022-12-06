@@ -1,10 +1,10 @@
 from django.contrib.auth import get_user_model
 from rest_framework import generics, permissions, status
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import RetrieveModelMixin, ListModelMixin
-from rest_framework.decorators import action
+from rest_framework.mixins import RetrieveModelMixin, ListModelMixin, UpdateModelMixin
 from rest_framework.response import Response
-from .serializers import RegisterSerializer, UserSerializer
+from .serializers import RegisterSerializer, UserSerializer, UserListSerializer
+from .permissions import IsOwnerOrAdmin
 
 User = get_user_model()
 
@@ -27,16 +27,32 @@ class RegisterView(generics.CreateAPIView):
         )
 
 
-class UserViewSet(RetrieveModelMixin, ListModelMixin, GenericViewSet):
-    queryset = User.objects.all()
-    permission_classes = [permissions.IsAuthenticated]
+class UserViewSet(RetrieveModelMixin, ListModelMixin, UpdateModelMixin, GenericViewSet):
+    serializer_class = UserSerializer
 
-    @action(detail=False)
-    def all(self, request):
-        serializer = UserSerializer(
-            User.objects.all(), many=True, context={"request": request}
-        )
-        return Response(status=status.HTTP_200_OK, data=serializer.data)
+    def get_queryset(self):
+        if self.action == "list":
+            return User.objects.all().exclude(id=self.request.user.id)
+        return User.objects.all()
+
+    def get_serializer_class(self):
+        if self.action == "list":
+            return UserListSerializer
+        return UserSerializer
+
+    def get_permissions(self):
+        if self.action == "list":
+            self.permission_classes = [permissions.IsAuthenticated]
+        if (
+            self.action == "retrieve"
+            or self.action == "update"
+            or self.action == "partial_update"
+        ):
+            self.permission_classes = [IsOwnerOrAdmin]
+        if self.action == "destroy":
+            self.permission_classes = [permissions.IsAdminUser]
+
+        return super(UserViewSet, self).get_permissions()
 
 
 class CurrentUserView(generics.RetrieveUpdateAPIView):

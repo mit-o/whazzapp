@@ -7,6 +7,20 @@ User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "is_active",
+            "is_staff",
+            "is_superuser",
+            "created_at",
+        )
+        lookup_field = "email"
+
     def create(self, validated_data):
         user = User.objects.create_user(
             email=validated_data["email"],
@@ -21,19 +35,16 @@ class UserSerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
+
+class UserListSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = (
             "id",
             "email",
-            "first_name",
-            "last_name",
-            "is_active",
-            "is_staff",
-            "is_superuser",
-            "created_at",
         )
         lookup_field = "email"
+        
 
 
 class RegisterSerializer(serializers.ModelSerializer):
