@@ -2,9 +2,11 @@ from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateMode
 from rest_framework.viewsets import GenericViewSet
 from rest_framework import permissions, status
 from rest_framework.response import Response
-from .models import Conversation
-
+from .models import Conversation, Message
 from .serializers import ConversationSerializer, createConversationSerializer
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class ConversationViewSet(
@@ -29,9 +31,16 @@ class ConversationViewSet(
 
     def create(self, request, *args, **kwargs):
         request_user = self.request.user.id
-        users = request.data.get("users") or [request_user]
-        updated_users = [*users, request_user] if request_user not in users else users
-        updated_data = {**request.data, "users": updated_users}
+        users = request.data.get("users") or []
+        name = ""
+
+        updated_users = [request_user, *users] if request_user not in users else users
+        if len(updated_users) < 3:
+            name = f"{', '.join([User.objects.get(id=user).email for user in updated_users])}"
+        else:
+            name = f"{', '.join([User.objects.get(id=user).email for user in updated_users[:2]])} and {len(updated_users) - 2} others"
+
+        updated_data = {**request.data, "name": name, "users": updated_users}
 
         serializer = self.get_serializer(data=updated_data)
         serializer.is_valid(raise_exception=True)

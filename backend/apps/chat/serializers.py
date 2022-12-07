@@ -18,7 +18,13 @@ class ConversationSerializer(serializers.ModelSerializer):
     def get_last_message(self, obj):
         messages = obj.messages.all().order_by("-timestamp")
         if not messages.exists():
-            return None
+            message = Message.objects.create(
+                conversation=obj,
+                sender=obj.users.first(),
+                receiver=obj.users.last(),
+                content="Conversation started",
+            )
+            return MessageSerializer(message).data
         message = messages[0]
         return MessageSerializer(message).data
 
