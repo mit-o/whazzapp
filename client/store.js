@@ -12,7 +12,6 @@ import {
 import authReducer from "./features/authSlice";
 import chatReducer from "./features/chatSlice";
 
-
 const persistConfig = {
   key: "root",
   storage,
@@ -20,7 +19,7 @@ const persistConfig = {
 
 const reducer = combineReducers({
   auth: persistReducer(persistConfig, authReducer),
-  chat: chatReducer,
+  chat: persistReducer(persistConfig, chatReducer),
 });
 
 export const store = configureStore({
