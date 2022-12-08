@@ -1,11 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import {
-  BsThreeDotsVertical,
-  BsSearch,
-  BsEmojiSmile,
-  BsPaperclip,
-  BsMicFill,
-} from "react-icons/bs";
+import { BsThreeDotsVertical, BsSearch } from "react-icons/bs";
 import Image from "next/image";
 import Dropdown from "../Dropdown";
 import Message from "./Message";
@@ -49,6 +43,21 @@ const ChatScreen = ({ messageHistory, sendMessage }) => {
     }
   }, [message]);
 
+  const actions = [
+    {
+      action: "Add to conversation",
+      func: () => console.log("Add to conversation"),
+    },
+    {
+      action: "Settings",
+      func: () => console.log("Settings"),
+    },
+    {
+      action: "Leave",
+      func: () => console.log("Leave"),
+    },
+  ];
+
   return (
     <div className="flex flex-col w-full lg:w-[calc(100%-400px)] h-full bg-primary self-end">
       {/* header */}
@@ -65,7 +74,6 @@ const ChatScreen = ({ messageHistory, sendMessage }) => {
           </div>
           <div>
             <p className="text-base font-semibold">{activeChat.name || ""}</p>
-            <p className="text-sm text-gray-400">last seen today at 12:40 am</p>
           </div>
         </div>
         <div className="flex space-x-2.5">
@@ -83,7 +91,7 @@ const ChatScreen = ({ messageHistory, sendMessage }) => {
             <span className="text-2xl">
               <BsThreeDotsVertical />
             </span>
-            <Dropdown actions={[]} isOpen={isDropdownOpen} />
+            <Dropdown actions={actions} isOpen={isDropdownOpen} />
           </div>
         </div>
       </div>
@@ -96,21 +104,9 @@ const ChatScreen = ({ messageHistory, sendMessage }) => {
       </div>
 
       {/* input */}
-      <div className="flex p-5 w-full bg-secondary text-stone-100 items-center">
-        <div className="flex space-x-2.5">
-          <div className="p-2 rounded-full cursor-pointer">
-            <span className="text-2xl">
-              <BsEmojiSmile />
-            </span>
-          </div>
-          <div className="p-2 rounded-full cursor-pointer">
-            <span className="text-2xl">
-              <BsPaperclip />
-            </span>
-          </div>
-        </div>
+      <div className="flex p-5 w-full space-x-2.5 bg-secondary text-stone-100 items-center">
         <form
-          className="flex grow mx-5 max-h-32 bg-primary opacity-70 rounded"
+          className="flex grow lg:mx-5 max-h-32 bg-primary opacity-70 rounded"
           onSubmit={sendMessageHandler}
           onKeyUp={onKeyUpHandler}
         >
@@ -130,11 +126,6 @@ const ChatScreen = ({ messageHistory, sendMessage }) => {
             Send
           </button>
         </form>
-        <div className="p-2 rounded-full cursor-pointer">
-          <span className="text-2xl">
-            <BsMicFill />
-          </span>
-        </div>
       </div>
     </div>
   );
