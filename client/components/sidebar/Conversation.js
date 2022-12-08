@@ -1,12 +1,6 @@
-import { useSelector } from "react-redux";
 import Image from "next/image";
 
-const Conversation = ({ click, participants, lastMessage }) => {
-  const { user } = useSelector((state) => state.auth);
-  const receiver = participants.filter(
-    (participant) => participant.id !== user.id
-  )[0];
-
+const Conversation = ({ click, lastMessage, name }) => {
   const formatTime = (time) => {
     const date = new Date(time);
     return date.toLocaleDateString();
@@ -28,8 +22,10 @@ const Conversation = ({ click, participants, lastMessage }) => {
       </div>
       <div className="flex flex-col w-full border-b py-2 border-secondary text-stone-400">
         <div className="flex flex-row w-full justify-between">
-          <p className="text-stone-100 font-medium">{receiver.email}</p>
-          <p className="text-xs">{formatTime(lastMessage.timestamp)}</p>
+          <p className="text-stone-100 font-medium">{name}</p>
+          <p className="text-xs">
+            {lastMessage?.timestamp ? formatTime(lastMessage.timestamp) : null}
+          </p>
         </div>
         <div className="text-sm">{lastMessage?.content}</div>
       </div>
