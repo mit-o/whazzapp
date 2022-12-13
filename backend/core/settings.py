@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 import os
+import pyrebase
 from corsheaders.defaults import default_headers
 from pathlib import Path
 from datetime import timedelta
@@ -192,3 +193,42 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+# Firebase settings
+
+FIREBASE_SERVICE = {
+    "type": os.environ["FB_SERVICE_TYPE"],
+    "project_id": os.environ["FB_SERVICE_PROJECT_ID"],
+    "private_key_id": os.environ["FB_SERVICE_PRIVATE_KEY_ID"],
+    "private_key": os.environ["FB_SERVICE_PRIVATE_KEY"],
+    "client_email": os.environ["FB_SERVICE_CLIENT_EMAIL"],
+    "client_id": os.environ["FB_SERVICE_CLIENT_ID"],
+    "auth_uri": os.environ["FB_SERVICE_AUTH_URI"],
+    "token_uri": os.environ["FB_SERVICE_TOKEN_URI"],
+    "auth_provider_x509_cert_url": os.environ["FB_SERVICE_AUTH_PROVIDER_X509_CERT_URL"],
+    "client_x509_cert_url": os.environ["FB_SERVICE_CLIENT_X509_CERT_URL"],
+}
+
+FIREBASE_CREDENTIALS = {
+    "login": os.environ["FIREBASE_LOGIN"],
+    "password": os.environ["FIREBASE_PASSWORD"],
+}
+
+FIREBASE_CONFIG = {
+    "apiKey": os.environ["FIREBASE_API_KEY"],
+    "authDomain": os.environ["FIREBASE_AUTH_DOMAIN"],
+    "projectId": os.environ["FIREBASE_PROJECT_ID"],
+    "storageBucket": os.environ["FIREBASE_STORAGE_BUCKET"],
+    "messagingSenderId": os.environ["FIREBASE_MESSAGING_SENDER_ID"],
+    "appId": os.environ["FIREBASE_APP_ID"],
+    "databaseURL": os.environ["FIREBASE_DATABASE_URL"],
+    "serviceAccount": FIREBASE_SERVICE,
+}
+
+
+firebase = pyrebase.initialize_app(FIREBASE_CONFIG)
+firebase_auth = firebase.auth()
+firebase_storage = firebase.storage()
+firebase_user = firebase_auth.sign_in_with_email_and_password(
+    FIREBASE_CREDENTIALS["login"], FIREBASE_CREDENTIALS["password"]
+)

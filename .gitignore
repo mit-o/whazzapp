@@ -33,7 +33,7 @@ client/*.tsbuildinfo
 client/next-env.d.ts
 
 # local env files
-.env
+*.env
 client/.env*.local
 
 # # # # # # # # #
