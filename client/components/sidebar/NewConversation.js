@@ -46,6 +46,7 @@ const NewConversation = ({ open }) => {
           <div className="w-14 h-14 rounded-full">
             <Image
               src="/avatar.png"
+              alt="avatar"
               layout="responsive"
               width="100%"
               height="100%"

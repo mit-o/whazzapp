@@ -70,6 +70,7 @@ const ChatScreen = ({ messageHistory, sendMessage }) => {
               height="100%"
               className="rounded-full object-cover"
               src="/avatar.png"
+              alt="avatar"
             />
           </div>
           <div>

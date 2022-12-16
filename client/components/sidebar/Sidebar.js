@@ -3,7 +3,8 @@ import { MdOutlineDoubleArrow } from "react-icons/md";
 import Header from "./Header";
 import Conversations from "./Conversations";
 import NewConversation from "./NewConversation";
-import useDetectScreen from "../../hooks/UseDetectScreen";
+import useDetectScreen from "../../hooks/useDetectScreen";
+
 const Sidebar = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isNewConversationOpen, setIsNewConversationOpen] = useState(false);

@@ -12,7 +12,7 @@ const Conversations = () => {
 
   useEffect(() => {
     dispatch(getConversations({ accessToken }));
-  }, []);
+  }, [accessToken]);
 
   return (
     <div className="flex flex-col py-3 text-base overflow-y-scroll scrollbar">

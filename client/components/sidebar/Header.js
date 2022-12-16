@@ -3,11 +3,12 @@ import { MdMessage, MdArrowBack } from "react-icons/md";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import Image from "next/image";
 import Dropdown from "../Dropdown";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../features/authSlice";
 
 const Header = ({ openNewConversation, isNewConversationOpen }) => {
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const actions = [
@@ -37,7 +38,8 @@ const Header = ({ openNewConversation, isNewConversationOpen }) => {
           width="100%"
           height="100%"
           className="rounded-full object-cover"
-          src="/avatar.jpeg"
+          src={user?.avatar || "/avatar.png"}
+          alt="avatar"
         />
       </div>
       <div className="flex space-x-2.5">
