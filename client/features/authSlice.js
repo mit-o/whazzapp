@@ -75,7 +75,7 @@ export const getUser = createAsyncThunk(
       accessToken = state.auth.tokens.access;
     }
     try {
-      const res = await fetch(`${API_BASE_URL}/me/`, {
+      const res = await fetch(`${API_BASE_URL}/users/me/`, {
         method: "GET",
         headers: {
           Accept: "application/json",
@@ -105,7 +105,6 @@ export const getUser = createAsyncThunk(
 );
 
 export const logout = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
-  const { dispatch } = thunkAPI;
   const state = thunkAPI.getState();
   const refresh = state.auth.tokens.refresh;
   const body = JSON.stringify({ refresh });
@@ -124,11 +123,9 @@ export const logout = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
     if (res.status === 200) {
       return data;
     } else {
-      dispatch(logout());
       return thunkAPI.rejectWithValue(data);
     }
   } catch (err) {
-    dispatch(logout());
     return thunkAPI.rejectWithValue(err.response.data);
   }
 });
@@ -222,6 +219,9 @@ const authSlice = createSlice({
       })
       .addCase(logout.rejected, (state) => {
         state.loading = false;
+        state.isAuthenticated = false;
+        state.tokens = null;
+        state.user = null;
       })
       .addCase(refreshToken.pending, (state) => {
         state.loading = true;

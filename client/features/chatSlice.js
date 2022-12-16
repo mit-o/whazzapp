@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { API_BASE_URL } from "../utils/api";
+import { logout } from "./authSlice";
 
 export const getConversations = createAsyncThunk(
   "chat/getConversations",
@@ -65,6 +66,10 @@ const chatSlice = createSlice({
     setActiveChat: (state, action) => {
       state.activeChat = action.payload;
     },
+    resetChat: (state) => {
+      state.activeChat = [];
+      state.conversations = [];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -73,11 +78,15 @@ const chatSlice = createSlice({
       })
       .addCase(getConversations.fulfilled, (state, action) => {
         state.conversations = action.payload;
+      })
+      .addCase(logout.fulfilled, (state) => {
+        state.activeChat = [];
+        state.conversations = [];
       });
   },
 });
 
 export const selectActiveChat = (state) => state.chat.activeChat;
 
-export const { setActiveChat } = chatSlice.actions;
+export const { setActiveChat, resetChat } = chatSlice.actions;
 export default chatSlice.reducer;
