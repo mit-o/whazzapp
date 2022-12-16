@@ -17,13 +17,13 @@ const persistConfig = {
   storage,
 };
 
-const reducer = combineReducers({
-  auth: persistReducer(persistConfig, authReducer),
-  chat: persistReducer(persistConfig, chatReducer),
+const reducers = combineReducers({
+  auth: authReducer,
+  chat: chatReducer,
 });
 
 export const store = configureStore({
-  reducer,
+  reducer: persistReducer(persistConfig, reducers),
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {
