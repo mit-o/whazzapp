@@ -18,11 +18,6 @@ class UUIDEncoder(json.JSONEncoder):
 
 
 class ChatConsumer(JsonWebsocketConsumer):
-    """
-    This consumer is used to show user's online status,
-    and send notifications.
-    """
-
     def __init__(self, *args, **kwargs):
         super().__init__(args, kwargs)
         self.user = None
@@ -65,7 +60,6 @@ class ChatConsumer(JsonWebsocketConsumer):
         if message_type == "chat_message":
             message = Message.objects.create(
                 sender=self.user,
-                receiver=self.get_receiver(),
                 content=content["message"],
                 conversation=self.conversation,
             )
@@ -80,12 +74,6 @@ class ChatConsumer(JsonWebsocketConsumer):
             )
 
         return super().receive_json(content, **kwargs)
-
-    def get_receiver(self):
-        ids = self.conversation.users.values_list("id", flat=True)
-        for id in ids:
-            if id != self.user.id:
-                return User.objects.get(id=id)
 
     def chat_message_echo(self, event):
         print(event)

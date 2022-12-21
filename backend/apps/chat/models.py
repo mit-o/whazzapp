@@ -1,5 +1,4 @@
 import uuid
-
 from django.contrib.auth import get_user_model
 from django.db import models
 
@@ -10,6 +9,8 @@ class Conversation(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=128)
     users = models.ManyToManyField(User, blank=True)
+    avatar = models.URLField(blank=True, null=True)
+    private = models.BooleanField(default=True)
 
     def get_users_count(self):
         return self.users.count()
@@ -32,10 +33,7 @@ class Message(models.Model):
         Conversation, on_delete=models.CASCADE, related_name="messages"
     )
     sender = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="sent_messages"
-    )
-    receiver = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="received_messages"
+        User, on_delete=models.CASCADE, related_name="message_sender"
     )
     content = models.CharField(max_length=512)
     timestamp = models.DateTimeField(auto_now_add=True)

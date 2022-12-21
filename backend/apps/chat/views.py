@@ -1,4 +1,10 @@
-from rest_framework.mixins import ListModelMixin, RetrieveModelMixin, CreateModelMixin
+from lib.firebase_storage import FirebaseStorageHelper
+from rest_framework.mixins import (
+    ListModelMixin,
+    RetrieveModelMixin,
+    CreateModelMixin,
+    UpdateModelMixin,
+)
 from rest_framework.viewsets import GenericViewSet
 from rest_framework import permissions, status
 from rest_framework.response import Response
@@ -10,12 +16,15 @@ User = get_user_model()
 
 
 class ConversationViewSet(
-    ListModelMixin, RetrieveModelMixin, CreateModelMixin, GenericViewSet
+    ListModelMixin,
+    RetrieveModelMixin,
+    CreateModelMixin,
+    UpdateModelMixin,
+    GenericViewSet,
 ):
     serializer_class = ConversationSerializer
     permission_classes = [permissions.IsAuthenticated]
-    queryset = Conversation.objects.none()
-    lookup_field = "id"
+    queryset = Conversation.objects.all()
 
     def get_queryset(self):
         queryset = Conversation.objects.filter(users=self.request.user.id)
@@ -30,19 +39,7 @@ class ConversationViewSet(
         return ConversationSerializer
 
     def create(self, request, *args, **kwargs):
-        request_user = self.request.user.id
-        users = request.data.get("users") or []
-        name = ""
-
-        updated_users = [request_user, *users] if request_user not in users else users
-        if len(updated_users) < 3:
-            name = f"{', '.join([User.objects.get(id=user).email for user in updated_users])}"
-        else:
-            name = f"{', '.join([User.objects.get(id=user).email for user in updated_users[:2]])} and {len(updated_users) - 2} others"
-
-        updated_data = {**request.data, "name": name, "users": updated_users}
-
-        serializer = self.get_serializer(data=updated_data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
@@ -51,3 +48,36 @@ class ConversationViewSet(
             status=status.HTTP_201_CREATED,
             headers=headers,
         )
+
+    def update(self, request, pk=None):
+        serializer = self.serializer_class(data=request.data)
+
+        uploaded_avatar = request.data.get("upload_avatar")
+
+        if serializer.is_valid():
+            if uploaded_avatar:
+                helper = FirebaseStorageHelper(pk, "avatars/conversations")
+                helper.delete_old_avatars()
+                avatar_url = helper.upload_avatar(uploaded_avatar)
+                serializer.validated_data["avatar"] = avatar_url
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def partial_update(self, request, pk=None):
+        conversation = self.get_object()
+        serializer = self.serializer_class(
+            conversation, data=request.data, partial=True
+        )
+
+        uploaded_avatar = request.data.get("upload_avatar")
+
+        if serializer.is_valid():
+            if uploaded_avatar:
+                helper = FirebaseStorageHelper(pk, "avatars/conversations")
+                helper.delete_old_avatars()
+                avatar_url = helper.upload_avatar(uploaded_avatar)
+                serializer.validated_data["avatar"] = avatar_url
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
