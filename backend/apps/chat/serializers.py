@@ -57,7 +57,8 @@ class createConversationSerializer(serializers.ModelSerializer):
     def validate(self, data):
         request_user = self.context["request"].user
         users = data.get("users", [])
-        users.append(request_user) if request_user not in users else users
+        if request_user not in users:
+            users.append(request_user)
 
         if len(users) < 2:
             raise ValidationError("Conversation must contain at least 2 users")
@@ -73,15 +74,17 @@ class createConversationSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        request_user = self.context["request"].user
         users = validated_data.pop("users", [])
         private_conversation = None
 
-        if len(users) == 2 and request_user in users:
-            private_conversation = Conversation.objects.filter(
-                private=True, users__in=users
-            ).first()
-
+        if len(users) == 2:
+            users_query = [user.id for user in users]
+            private_conversations = Conversation.objects.filter(private=True)
+            for conversation in private_conversations:
+                conversation_users = [user.id for user in conversation.users.all()]
+                if set(conversation_users) == set(users_query):
+                    private_conversation = conversation
+                    break
         if private_conversation:
             return private_conversation
 
