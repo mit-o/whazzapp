@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Message, Conversation
-from apps.accounts.serializers import UserSerializer
+from apps.accounts.serializers import UserListSerializer
 from django.core.exceptions import ValidationError
 from lib.firebase_storage import MAX_AVATAR_SIZE
 from django.contrib.auth import get_user_model
@@ -45,7 +45,7 @@ class ConversationSerializer(serializers.ModelSerializer):
         return MessageSerializer(messages[0]).data
 
     def get_participants(self, obj):
-        return [UserSerializer(user).data for user in obj.users.all()]
+        return [UserListSerializer(user).data for user in obj.users.all()]
 
 
 class createConversationSerializer(serializers.ModelSerializer):
@@ -63,10 +63,10 @@ class createConversationSerializer(serializers.ModelSerializer):
         if len(users) < 2:
             raise ValidationError("Conversation must contain at least 2 users")
         elif len(users) == 2:
-            data["name"] = ", ".join([user.email for user in users])
+            data["name"] = ", ".join([user.display_name for user in users])
         elif len(users) >= 3:
             data["private"] = False
-            first_users = f"{', '.join([user.email for user in users[:3]])}"
+            first_users = f"{', '.join([user.display_name for user in users[:3]])}"
             if len(users) == 3:
                 data["name"] = first_users
             else:
@@ -112,4 +112,4 @@ class MessageSerializer(serializers.ModelSerializer):
         return str(obj.conversation.id)
 
     def get_sender(self, obj):
-        return UserSerializer(obj.sender).data
+        return UserListSerializer(obj.sender).data

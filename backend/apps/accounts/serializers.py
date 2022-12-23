@@ -27,6 +27,7 @@ class UserSerializer(serializers.ModelSerializer):
             "created_at",
             "upload_avatar",
             "avatar",
+            "display_name",
         )
         lookup_field = "email"
 
@@ -40,10 +41,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     def validate_upload_avatar(self, value):
         if value and value.size > MAX_AVATAR_SIZE:
-            size_in_MiB= MAX_AVATAR_SIZE / 1024 / 1024
-            raise ValidationError(
-                f"Please keep filesize under {size_in_MiB} MiB."
-            )
+            size_in_MiB = MAX_AVATAR_SIZE / 1024 / 1024
+            raise ValidationError(f"Please keep filesize under {size_in_MiB} MiB.")
         return value
 
     def create(self, validated_data):
@@ -67,9 +66,9 @@ class UserListSerializer(serializers.ModelSerializer):
         model = User
         fields = (
             "id",
-            "email",
+            "display_name",
         )
-        lookup_field = "email"
+        lookup_field = "display_name"
 
 
 class RegisterSerializer(serializers.ModelSerializer):
