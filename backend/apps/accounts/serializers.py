@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.exceptions import ValidationError
-from lib.firebase_storage import MAX_AVATAR_SIZE
+from lib.firebase_storage import MAX_AVATAR_SIZE, FirebaseStorageHelper
 
 User = get_user_model()
 
@@ -60,6 +60,13 @@ class UserSerializer(serializers.ModelSerializer):
             instance.set_password(password)
         return super().update(instance, validated_data)
 
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if data["avatar"] is None:
+            helper = FirebaseStorageHelper(None, "avatars/users")
+            data["avatar"] = helper.get_default_avatar()
+        return data
+
 
 class UserListSerializer(serializers.ModelSerializer):
     class Meta:
@@ -67,8 +74,16 @@ class UserListSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "display_name",
+            "avatar",
         )
         lookup_field = "display_name"
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if data["avatar"] is None:
+            helper = FirebaseStorageHelper(None, "avatars/users")
+            data["avatar"] = helper.get_default_avatar()
+        return data
 
 
 class RegisterSerializer(serializers.ModelSerializer):

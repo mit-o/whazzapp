@@ -28,3 +28,6 @@ class FirebaseStorageHelper:
             avatar_file, firebase_user["idToken"]
         )
         return firebase_storage.child(path_to_avatar).get_url(None)
+
+    def get_default_avatar(self):
+        return firebase_storage.child(f"{self.path_prefix}/default.webp").get_url(None)

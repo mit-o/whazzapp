@@ -2,7 +2,7 @@ from rest_framework import serializers
 from .models import Message, Conversation
 from apps.accounts.serializers import UserListSerializer
 from django.core.exceptions import ValidationError
-from lib.firebase_storage import MAX_AVATAR_SIZE
+from lib.firebase_storage import MAX_AVATAR_SIZE, FirebaseStorageHelper
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -47,6 +47,48 @@ class ConversationSerializer(serializers.ModelSerializer):
     def get_participants(self, obj):
         return [UserListSerializer(user).data for user in obj.users.all()]
 
+    @classmethod
+    def get_conversation_display_data(cls, logged_in_user, conversation):
+        other_user = None
+        for user in conversation.users.all():
+            if user != logged_in_user:
+                other_user = user
+                break
+
+        if not other_user.avatar:
+            helper = FirebaseStorageHelper(None, "avatars/users")
+            other_user.avatar = helper.get_default_avatar()
+
+        return {
+            "name": other_user.display_name,
+            "avatar": other_user.avatar,
+        }
+
+    def to_representation(self, instance):
+        logged_in_user = self.context["request"].user
+        display_data = self.get_conversation_display_data(logged_in_user, instance)
+        data = super().to_representation(instance)
+
+        if data["private"]:
+            data["name"] = display_data["name"]
+            data["avatar"] = display_data["avatar"]
+
+        if data["name"] == "" and not data["private"]:
+            users = instance.users.all()
+
+            if len(users) >= 3:
+                first_users = f"{', '.join([user.display_name for user in users[:3]])}"
+                if len(users) == 3:
+                    data["name"] = first_users
+                else:
+                    data["name"] = f"{first_users} and {len(users) - 3} others"
+
+        if data["avatar"] is None and not data["private"]:
+            helper = FirebaseStorageHelper(None, "avatars/conversations")
+            data["avatar"] = helper.get_default_avatar()
+
+        return data
+
 
 class createConversationSerializer(serializers.ModelSerializer):
     class Meta:
@@ -62,15 +104,8 @@ class createConversationSerializer(serializers.ModelSerializer):
 
         if len(users) < 2:
             raise ValidationError("Conversation must contain at least 2 users")
-        elif len(users) == 2:
-            data["name"] = ", ".join([user.display_name for user in users])
         elif len(users) >= 3:
             data["private"] = False
-            first_users = f"{', '.join([user.display_name for user in users[:3]])}"
-            if len(users) == 3:
-                data["name"] = first_users
-            else:
-                data["name"] = f"{first_users} and {len(users) - 3} others"
         return data
 
     def create(self, validated_data):

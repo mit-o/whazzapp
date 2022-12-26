@@ -44,7 +44,9 @@ class ConversationViewSet(
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(
-            ConversationSerializer().to_representation(serializer.instance),
+            ConversationSerializer(
+                context=self.get_serializer_context()
+            ).to_representation(serializer.instance),
             status=status.HTTP_201_CREATED,
             headers=headers,
         )

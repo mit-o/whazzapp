@@ -68,7 +68,7 @@ class ChatConsumer(JsonWebsocketConsumer):
                 self.conversation_id,
                 {
                     "type": "chat_message_echo",
-                    "name": self.user.display_name,
+                    "name": self.user.id,
                     "message": MessageSerializer(message).data,
                 },
             )
