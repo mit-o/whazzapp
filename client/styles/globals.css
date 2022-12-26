@@ -21,17 +21,17 @@ main {
 }
 
 *::-webkit-scrollbar-track {
-  background: #233138;
+  background: #fffffe;
   border: 1px solid transparent;
   border-radius: 8px;
 }
 
 *::-webkit-thumb {
-  background: #121b21;
+  background: #fffffe;
   border: 1px solid transparent;
   border-radius: 8px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: #121b21;
+  background: #d1d2d6;
 }
