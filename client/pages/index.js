@@ -68,12 +68,14 @@ const Home = () => {
   return (
     <>
       <Seo title="Whazzapp" />
-      <main className="flex">
+      <main className="flex bg-light">
         <Sidebar />
-        <ChatScreen
-          sendMessage={sendJsonMessage}
-          messageHistory={messageHistory}
-        />
+        {activeChat.length !== 0 && (
+          <ChatScreen
+            sendMessage={sendJsonMessage}
+            messageHistory={messageHistory}
+          />
+        )}
       </main>
     </>
   );
