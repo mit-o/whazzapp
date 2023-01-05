@@ -31,7 +31,7 @@ const ChatHeader = () => {
             width="100%"
             height="100%"
             className="rounded-full object-cover"
-            src={activeChat.avatar || "/group-default.png"}
+            src={activeChat.avatar}
             alt="avatar"
           />
         </div>

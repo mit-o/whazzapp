@@ -10,21 +10,26 @@ const Message = ({ message }) => {
     yesterday.setDate(yesterday.getDate() - 1);
 
     const date = new Date(time);
-    const formatedDate = date.toLocaleTimeString().slice(0, 5);
+    const formatedTimestamp = date.toLocaleTimeString().slice(0, 5);
+    const formatedDate = date.toLocaleDateString();
 
     if (date.toDateString() === today.toDateString()) {
-      return "Today " + formatedDate;
+      return formatedTimestamp;
     } else if (date.toDateString() === yesterday.toDateString()) {
-      return "Yesterday " + formatedDate;
+      return "Yesterday " + formatedTimestamp;
     } else {
-      return formatedDate;
+      return formatedDate + " " + formatedTimestamp;
     }
   };
 
   return (
-    <div className={`w-fit h-fit max-w-[50%] ${isSender ? "self-end" : null}`}>
+    <div
+      className={`flex flex-col h-fit max-w-[50%] ${
+        isSender ? "self-end items-end" : null
+      }`}
+    >
       <div
-        className={`flex px-6 py-4 rounded-lg items-center shadow-lg border-gray ${
+        className={`flex w-fit px-5 py-4 rounded-lg items-center shadow-lg border-gray ${
           isSender ? "bg-accent text-light" : "bg-light text-dark"
         }`}
       >
