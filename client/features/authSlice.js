@@ -103,6 +103,42 @@ export const getUser = createAsyncThunk(
     }
   }
 );
+export const editUser = createAsyncThunk(
+  "auth/editUser",
+  async (accessToken, thunkAPI) => {
+    if (!accessToken) {
+      const state = thunkAPI.getState();
+      accessToken = state.auth.tokens.access;
+    }
+    try {
+      const res = await fetch(`${API_BASE_URL}/users/me/`, {
+        method: "PATCH",
+        headers: {
+          Accept: "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const data = await res.json();
+
+      if (res.status === 200) {
+        return data;
+      } else if (res.status === 401) {
+        const { dispatch } = thunkAPI;
+        const dispatchRefresh = dispatch(refreshToken());
+        if (dispatchRefresh.fulfilled) {
+          dispatch(editUser());
+        } else {
+          return thunkAPI.rejectWithValue(data);
+        }
+      } else {
+        return thunkAPI.rejectWithValue(data);
+      }
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response.data);
+    }
+  }
+);
 
 export const logout = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
   const state = thunkAPI.getState();
@@ -206,6 +242,16 @@ const authSlice = createSlice({
         state.user = action.payload;
       })
       .addCase(getUser.rejected, (state) => {
+        state.loading = false;
+      })
+      .addCase(editUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(editUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(editUser.rejected, (state) => {
         state.loading = false;
       })
       .addCase(logout.pending, (state) => {
