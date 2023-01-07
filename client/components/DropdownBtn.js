@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import BtnIcon from "./BtnIcon";
 import Dropdown from "./Dropdown";
 
 const DropdownBtn = ({ actions }) => {
@@ -10,17 +11,16 @@ const DropdownBtn = ({ actions }) => {
   };
 
   return (
-    <div
-      className={`relative p-2 rounded-full cursor-pointer ${
+    <BtnIcon
+      btnClasses={`relative p-2 rounded-full ${
         isDropdownOpen ? "bg-accent" : null
       }`}
+      iconClasses={`text-2xl ${isDropdownOpen ? "text-light" : ""}`}
+      icon={<BsThreeDotsVertical />}
       onClick={openDropdownHandler}
     >
-      <span className={`text-2xl ${isDropdownOpen ? "text-light" : null}`}>
-        <BsThreeDotsVertical />
-      </span>
       <Dropdown actions={actions} isOpen={isDropdownOpen} />
-    </div>
+    </BtnIcon>
   );
 };
 
