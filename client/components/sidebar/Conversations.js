@@ -15,10 +15,11 @@ const Conversations = () => {
   }, [accessToken]);
 
   return (
-    <div className="flex flex-col py-3 text-base overflow-y-scroll scrollbar">
+    <div className="flex flex-col p-6 gap-7 text-base overflow-y-scroll scrollbar">
       {conversations?.map((conversation) => (
         <Conversation
           key={conversation.id}
+          avatar={conversation.avatar}
           lastMessage={conversation.last_message}
           name={conversation.name}
           click={() => dispatch(setActiveChat(conversation))}

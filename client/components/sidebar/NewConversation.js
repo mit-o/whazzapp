@@ -26,11 +26,11 @@ const NewConversation = ({ open }) => {
   };
 
   return (
-    <div className="flex flex-col py-3 text-base overflow-y-scroll scrollbar">
+    <div className="flex flex-col p-3 gap-5 text-base overflow-y-scroll scrollbar">
       {appendingUsers.length > 0 && (
         <button
           onClick={createConversationHandler}
-          className="mx-5 my-3 border rounded border-transparent bg-teal-300 p-3 text-primary font-medium hover:bg-teal-400"
+          className="border rounded border-transparent bg-accent p-3 my-2 text-light font-medium hover:bg-accentplus"
         >
           Create chat
         </button>
@@ -38,14 +38,14 @@ const NewConversation = ({ open }) => {
       {users?.map((user) => (
         <div
           key={user.id}
-          className={`flex items-center cursor-pointer px-5 py-3 my-1 gap-x-5 hover:bg-secondary ${
-            appendingUsers.includes(user.id) ? "bg-secondary" : null
+          className={`flex items-center cursor-pointer px-5 gap-3 py-2 shadow-lg border border-lightextra rounded-lg ${
+            appendingUsers.includes(user.id) ? "bg-accent text-light" : null
           }`}
           onClick={() => manageUsersHandler(user.id)}
         >
           <div className="w-14 h-14 rounded-full">
             <Image
-              src="/avatar.png"
+              src={user.avatar}
               alt="avatar"
               layout="responsive"
               width="100%"
@@ -53,11 +53,11 @@ const NewConversation = ({ open }) => {
               className="rounded-full object-cover"
             />
           </div>
-          <div className="flex justify-between w-full py-2  text-stone-200 font-medium">
-            <p>{user.email}</p>
+          <div className="flex justify-between w-full py-2 font-extrabold">
+            <p>{user.display_name}</p>
 
             {appendingUsers.includes(user.id) ? (
-              <span className="text-2xl text-teal-300">
+              <span className="text-2xl text-light">
                 <MdCheckBox />
               </span>
             ) : (
