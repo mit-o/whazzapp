@@ -8,8 +8,17 @@ const Profile = () => {
   return (
     <div className="flex flex-col p-6 gap-7 text-base">
       <ProfileAvatar avatar={user?.avatar} />
-      <ProfileInput label="Display name:" userText={user?.display_name} />
-      <ProfileInput label="Email:" userText={user?.email} blocked />
+      <ProfileInput
+        label="Display name:"
+        name="display_name"
+        userText={user?.display_name}
+      />
+      <ProfileInput
+        label="Email:"
+        name="email"
+        userText={user?.email}
+        blocked
+      />
     </div>
   );
 };
