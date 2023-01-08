@@ -103,36 +103,47 @@ export const getUser = createAsyncThunk(
     }
   }
 );
+
 export const editUser = createAsyncThunk(
   "auth/editUser",
-  async (accessToken, thunkAPI) => {
-    if (!accessToken) {
-      const state = thunkAPI.getState();
-      accessToken = state.auth.tokens.access;
+  async ({ data, accessToken }, thunkAPI) => {
+    let body;
+    if (data instanceof FormData) {
+      body = data;
+    } else {
+      body = JSON.stringify(data);
     }
+
+    const headers = {
+      Accept: "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    };
+
+    if (!(data instanceof FormData)) {
+      headers["Content-Type"] = "application/json";
+    }
+
     try {
       const res = await fetch(`${API_BASE_URL}/users/me/`, {
         method: "PATCH",
-        headers: {
-          Accept: "application/json",
-          Authorization: `Bearer ${accessToken}`,
-        },
+        headers,
+        body,
       });
 
-      const data = await res.json();
+      const resData = await res.json();
 
       if (res.status === 200) {
-        return data;
+        return resData;
       } else if (res.status === 401) {
         const { dispatch } = thunkAPI;
         const dispatchRefresh = dispatch(refreshToken());
         if (dispatchRefresh.fulfilled) {
           dispatch(editUser());
         } else {
-          return thunkAPI.rejectWithValue(data);
+          return thunkAPI.rejectWithValue(resData);
         }
       } else {
-        return thunkAPI.rejectWithValue(data);
+        return thunkAPI.rejectWithValue(resData);
       }
     } catch (err) {
       return thunkAPI.rejectWithValue(err.response.data);
