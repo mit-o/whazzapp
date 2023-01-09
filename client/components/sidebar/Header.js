@@ -46,7 +46,7 @@ const Header = ({
   return (
     <div className="flex p-5 justify-between text-stone-400">
       <BtnIcon className="rounded-full" onClick={openProfileHandler}>
-        <Avatar className="w-10 h-10" src={user?.avatar} />
+        {user?.avatar && <Avatar className="w-10 h-10" src={user.avatar} />}
       </BtnIcon>
       <div className="flex gap-2">
         <BtnIcon
