@@ -6,11 +6,12 @@ import Profile from "../profile/Profile";
 import Frame from "../Frame";
 
 const Sidebar = () => {
+  const [isFrameOpen, setIsFrameOpen] = useState(false);
   const [isNewConversationOpen, setIsNewConversationOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
 
   return (
-    <Frame>
+    <Frame isFrameOpen={isFrameOpen} openFrame={setIsFrameOpen}>
       <Header
         openNewConversation={setIsNewConversationOpen}
         isNewConversationOpen={isNewConversationOpen}
