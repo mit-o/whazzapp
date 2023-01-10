@@ -19,6 +19,7 @@ const Conversations = () => {
       {conversations?.map((conversation) => (
         <Conversation
           key={conversation.id}
+          id={conversation.id}
           avatar={conversation.avatar}
           lastMessage={conversation.last_message}
           name={conversation.name}
