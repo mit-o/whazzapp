@@ -86,16 +86,6 @@ const Login = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-center">
-                <div className="text-md">
-                  <Link href="#">
-                    <a className="font-semibold text-dark">
-                      Forgot your password?
-                    </a>
-                  </Link>
-                </div>
-              </div>
-
               <div>
                 <button
                   type="submit"
