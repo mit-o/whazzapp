@@ -4,17 +4,29 @@ import { BsSearch } from "react-icons/bs";
 import Image from "next/image";
 import DropdownBtn from "../DropdownBtn";
 
-const ChatHeader = () => {
+const ChatHeader = ({ openSettings }) => {
   const activeChat = useSelector(selectActiveChat);
+  const isPrivate = activeChat.private;
 
-  const actions = [
+  const privateActions = [
     {
-      action: "Add to conversation",
-      func: () => console.log("Add to conversation"),
+      action: "Settings",
+      func: () => openSettings((prev) => !prev),
+    },
+    {
+      action: "Remove",
+      func: () => console.log("Remove"),
+    },
+  ];
+
+  const groupActions = [
+    {
+      action: "Participants",
+      func: () => console.log("Participants"),
     },
     {
       action: "Settings",
-      func: () => console.log("Settings"),
+      func: () => openSettings((prev) => !prev),
     },
     {
       action: "Leave",
@@ -23,7 +35,7 @@ const ChatHeader = () => {
   ];
 
   return (
-    <div className="flex p-5 w-full h-20 justify-between items-center text-stone-400 border-b border-stone-300/30">
+    <div className="relative flex p-5 w-full h-20 justify-between items-center text-stone-400 border-b border-stone-300/30">
       <div className="flex space-x-2.5 items-center">
         <div className="w-10 h-10 rounded-full cursor-pointer">
           <Image
@@ -47,7 +59,7 @@ const ChatHeader = () => {
             <BsSearch />
           </span>
         </div>
-        <DropdownBtn actions={actions} />
+        <DropdownBtn actions={isPrivate ? privateActions : groupActions} />
       </div>
     </div>
   );
