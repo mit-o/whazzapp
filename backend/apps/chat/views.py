@@ -52,7 +52,10 @@ class ConversationViewSet(
         )
 
     def update(self, request, pk=None):
-        serializer = self.serializer_class(data=request.data)
+        conversation = self.get_object()
+        serializer = self.serializer_class(
+            conversation, data=request.data, context={"request": request}
+        )
 
         uploaded_avatar = request.data.get("upload_avatar")
 
@@ -69,7 +72,7 @@ class ConversationViewSet(
     def partial_update(self, request, pk=None):
         conversation = self.get_object()
         serializer = self.serializer_class(
-            conversation, data=request.data, partial=True
+            conversation, data=request.data, context={"request": request}, partial=True
         )
 
         uploaded_avatar = request.data.get("upload_avatar")
