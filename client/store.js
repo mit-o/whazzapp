@@ -12,19 +12,18 @@ import {
 import authReducer from "./features/authSlice";
 import chatReducer from "./features/chatSlice";
 
-
 const persistConfig = {
   key: "root",
   storage,
 };
 
-const reducer = combineReducers({
-  auth: persistReducer(persistConfig, authReducer),
+const reducers = combineReducers({
+  auth: authReducer,
   chat: chatReducer,
 });
 
 export const store = configureStore({
-  reducer,
+  reducer: persistReducer(persistConfig, reducers),
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: {

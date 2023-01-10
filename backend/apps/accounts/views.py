@@ -1,10 +1,14 @@
 from django.contrib.auth import get_user_model
+from lib.firebase_storage import FirebaseStorageHelper
 from rest_framework import generics, permissions, status
 from rest_framework.viewsets import GenericViewSet
-from rest_framework.mixins import RetrieveModelMixin, ListModelMixin
-from rest_framework.decorators import action
+from rest_framework.mixins import RetrieveModelMixin, ListModelMixin, UpdateModelMixin
 from rest_framework.response import Response
-from .serializers import RegisterSerializer, UserSerializer
+from rest_framework.decorators import action
+from core.settings import firebase_user, firebase_storage
+from .serializers import RegisterSerializer, UserSerializer, UserListSerializer
+from .permissions import IsOwnerOrAdmin
+from secrets import token_hex
 
 User = get_user_model()
 
@@ -27,16 +31,12 @@ class RegisterView(generics.CreateAPIView):
         )
 
 
-class UserViewSet(RetrieveModelMixin, ListModelMixin, GenericViewSet):
-    queryset = User.objects.all()
+class ListUsersView(generics.ListAPIView):
+    serializer_class = UserListSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    @action(detail=False)
-    def all(self, request):
-        serializer = UserSerializer(
-            User.objects.all(), many=True, context={"request": request}
-        )
-        return Response(status=status.HTTP_200_OK, data=serializer.data)
+    def get_queryset(self):
+        return User.objects.all().exclude(id=self.request.user.id)
 
 
 class CurrentUserView(generics.RetrieveUpdateAPIView):
@@ -49,7 +49,15 @@ class CurrentUserView(generics.RetrieveUpdateAPIView):
 
     def update(self, request):
         serializer = self.serializer_class(request.user, data=request.data)
+
+        uploaded_avatar = request.data.get("upload_avatar")
+
         if serializer.is_valid():
+            if uploaded_avatar:
+                helper = FirebaseStorageHelper(request.user.id, "avatars/users")
+                helper.delete_old_avatars()
+                avatar_url = helper.upload_avatar(uploaded_avatar)
+                serializer.validated_data["avatar"] = avatar_url
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -58,7 +66,15 @@ class CurrentUserView(generics.RetrieveUpdateAPIView):
         serializer = self.serializer_class(
             request.user, data=request.data, partial=True
         )
+
+        uploaded_avatar = request.data.get("upload_avatar")
+
         if serializer.is_valid():
+            if uploaded_avatar:
+                helper = FirebaseStorageHelper(request.user.id, "avatars/users")
+                helper.delete_old_avatars()
+                avatar_url = helper.upload_avatar(uploaded_avatar)
+                serializer.validated_data["avatar"] = avatar_url
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

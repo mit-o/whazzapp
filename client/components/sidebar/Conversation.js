@@ -1,11 +1,10 @@
-import { useSelector } from "react-redux";
 import Image from "next/image";
+import { useSelector } from "react-redux";
+import { selectActiveChat } from "../../features/chatSlice";
 
-const Conversation = ({ click, participants, lastMessage }) => {
-  const { user } = useSelector((state) => state.auth);
-  const receiver = participants.filter(
-    (participant) => participant.id !== user.id
-  )[0];
+const Conversation = ({ id, name, avatar, lastMessage, click }) => {
+  const activeChat = useSelector(selectActiveChat);
+  const isActive = activeChat?.id === id;
 
   const formatTime = (time) => {
     const date = new Date(time);
@@ -14,24 +13,43 @@ const Conversation = ({ click, participants, lastMessage }) => {
 
   return (
     <div
-      className="flex flex-row items-center cursor-pointer px-5 py-3 gap-x-5 hover:bg-secondary"
+      className={`flex flex-row min-h-[150px] items-center cursor-pointer px-5 py-3 gap-x-5 transition-all duration-300 ${
+        isActive
+          ? "bg-dark border-l-8 border-l-accent"
+          : "bg-light hover:bg-accent"
+      } border-lightextra border shadow-lg rounded-lg`}
       onClick={click}
     >
       <div className="w-14 h-14 rounded-full">
         <Image
-          src="/avatar.png"
+          src={avatar}
+          alt="avatar"
           layout="responsive"
           width="100%"
           height="100%"
           className="rounded-full object-cover"
         />
       </div>
-      <div className="flex flex-col w-full border-b py-2 border-secondary text-stone-400">
+      <div className="flex flex-col w-full py-2 border-secondary text-gray">
         <div className="flex flex-row w-full justify-between">
-          <p className="text-stone-100 font-medium">{receiver.email}</p>
-          <p className="text-xs">{formatTime(lastMessage.timestamp)}</p>
+          <p
+            className={`${
+              isActive ? "text-light" : "text-dark"
+            } font-extrabold text-lg`}
+          >
+            {name}
+          </p>
+          <p className="text-md font-semibold">
+            {lastMessage?.timestamp ? formatTime(lastMessage.timestamp) : null}
+          </p>
         </div>
-        <div className="text-sm">{lastMessage?.content}</div>
+        <div
+          className={`text-sm font-medium ${
+            isActive ? "text-gray" : "text-dark"
+          }`}
+        >
+          {lastMessage?.content}
+        </div>
       </div>
     </div>
   );

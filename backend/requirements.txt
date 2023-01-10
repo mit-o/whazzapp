@@ -53,3 +53,5 @@ typing_extensions==4.4.0
 urllib3==1.26.12
 wrapt==1.14.1
 zope.interface==5.5.0
+Pyrebase4==4.6.0
+Pillow==9.3.0

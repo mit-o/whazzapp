@@ -1,25 +1,18 @@
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.exceptions import ValidationError
+from django.core.exceptions import ValidationError
+from lib.firebase_storage import MAX_AVATAR_SIZE, FirebaseStorageHelper
 
 User = get_user_model()
 
 
 class UserSerializer(serializers.ModelSerializer):
-    def create(self, validated_data):
-        user = User.objects.create_user(
-            email=validated_data["email"],
-        )
-
-        user.set_password(validated_data["password"])
-        user.save()
-        return user
-
-    def update(self, instance, validated_data):
-        instance.set_password(validated_data["password"])
-        instance.save()
-        return instance
+    upload_avatar = serializers.ImageField(
+        use_url=True,
+        required=False,
+        write_only=True,
+    )
 
     class Meta:
         model = User
@@ -32,8 +25,65 @@ class UserSerializer(serializers.ModelSerializer):
             "is_staff",
             "is_superuser",
             "created_at",
+            "upload_avatar",
+            "avatar",
+            "display_name",
         )
         lookup_field = "email"
+
+        extra_kwargs = {
+            "email": {"read_only": True},
+            "is_active": {"read_only": True},
+            "is_staff": {"read_only": True},
+            "is_superuser": {"read_only": True},
+            "created_at": {"read_only": True},
+        }
+
+    def validate_upload_avatar(self, value):
+        if value and value.size > MAX_AVATAR_SIZE:
+            size_in_MiB = MAX_AVATAR_SIZE / 1024 / 1024
+            raise ValidationError(f"Please keep filesize under {size_in_MiB} MiB.")
+        return value
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            email=validated_data["email"],
+        )
+
+        user.set_password(validated_data["password"])
+        user.save()
+        return user
+
+    def update(self, instance, validated_data):
+        if "password" in validated_data:
+            password = validated_data.pop("password", None)
+            instance.set_password(password)
+        return super().update(instance, validated_data)
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if data["avatar"] is None:
+            helper = FirebaseStorageHelper(None, "avatars/users")
+            data["avatar"] = helper.get_default_avatar()
+        return data
+
+
+class UserListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "id",
+            "display_name",
+            "avatar",
+        )
+        lookup_field = "display_name"
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if data["avatar"] is None:
+            helper = FirebaseStorageHelper(None, "avatars/users")
+            data["avatar"] = helper.get_default_avatar()
+        return data
 
 
 class RegisterSerializer(serializers.ModelSerializer):

@@ -40,17 +40,17 @@ const Login = () => {
   return (
     <>
       <Seo title={"Login - Whazzapp"} />
-      <main className="flex items-center justify-center bg-primary">
-        <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <main className="flex items-center justify-center bg-light">
+        <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-1 rounded-lg h-4/5 w-3/4">
           <div className="w-full max-w-md space-y-8">
             <div>
-              <h2 className="mt-6 text-center text-4xl font-bold text-teal-300">
+              <h2 className="mt-6 text-center text-4xl font-extrabold text-dark">
                 Sign in to your account
               </h2>
-              <p className="mt-2 font-medium text-center text-md text-stone-100">
+              <p className="mt-2 font-medium text-center text-md text-dark">
                 or{" "}
                 <Link href="/register">
-                  <a className="text-stone-100 hover:text-teal-400 underline">
+                  <a className="text-accent font-semibold">
                     start using Whazzapp right now!
                   </a>
                 </Link>
@@ -60,49 +60,36 @@ const Login = () => {
               className="mt-8 space-y-6"
               onSubmit={handleSubmit((data) => dispatch(login(data)))}
             >
-              <div className="rounded flex flex-col gap-3">
+              <div className="flex flex-col gap-3">
                 <div className="">
                   <label
                     htmlFor="email-address"
-                    className="text-stone-100 font-medium"
+                    className="text-dark font-semibold"
                   >
                     Email address
                   </label>
                   <input
                     type="text"
-                    className="relative block w-full rounded border border-gray-500 mt-3 px-3 py-2 text-gray-900 focus:z-10 focus:border-teal-500 focus:outline-none focus:ring-teal-500 sm:text-sm"
+                    className="relative block w-full rounded-lg border border-gray mt-3 p-2.5 text-dark focus:z-10 focus:border-accent focus:outline-none focus:ring-accent sm:text-sm shadow-md"
                     {...register("email")}
                   />
                 </div>
                 <div>
-                  <label
-                    htmlFor="password"
-                    className="text-stone-100 font-medium"
-                  >
+                  <label htmlFor="password" className="text-dark font-semibold">
                     Password
                   </label>
                   <input
                     type="password"
-                    className="relative block w-full rounded border border-gray-500 mt-3 px-3 py-2 text-gray-900  focus:z-10 focus:border-teal-500 focus:outline-none focus:ring-teal-500 sm:text-sm"
+                    className="relative block w-full rounded-lg border border-gray mt-3 p-2.5 text-dark  focus:z-10 focus:border-accent focus:outline-none focus:ring-accent sm:text-sm shadow-md"
                     {...register("password")}
                   />
-                </div>
-              </div>
-
-              <div className="flex items-center justify-center">
-                <div className="text-md">
-                  <Link href="#">
-                    <a className="font-medium text-stone-100 hover:text-teal-400">
-                      Forgot your password?
-                    </a>
-                  </Link>
                 </div>
               </div>
 
               <div>
                 <button
                   type="submit"
-                  className="group relative flex w-full justify-center rounded-md border border-transparent bg-teal-500 py-2 px-4 text-sm font-medium text-white hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+                  className="group relative flex w-full justify-center rounded-lg bg-accent p-2.5 text-md font-bold text-light hover:bg-accentplus focus:outline-none focus:ring-2 focus:ring-accentplus focus:ring-offset-2 shadow-md"
                 >
                   Sign in
                 </button>

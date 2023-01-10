@@ -3,7 +3,7 @@ import useWebSocket, { ReadyState } from "react-use-websocket";
 import { WS_BASE_URL } from "../utils/api";
 import { useRouter } from "next/router";
 import { useSelector } from "react-redux";
-import { setActiveChat } from "../features/chatSlice";
+import { selectActiveChat } from "../features/chatSlice";
 import Seo from "../components/Seo";
 import RequireAuth from "../components/RequireAuth";
 import Sidebar from "../components/sidebar/Sidebar";
@@ -12,7 +12,7 @@ import ChatScreen from "../components/chat/ChatScreen";
 const Home = () => {
   const router = useRouter();
   const { isAuthenticated, tokens } = useSelector((state) => state.auth);
-  const { activeChat } = useSelector(setActiveChat);
+  const activeChat = useSelector(selectActiveChat);
   const [welcomeMessage, setWelcomeMessage] = useState("");
   const [messageHistory, setMessageHistory] = useState([]);
   const { readyState, sendJsonMessage } = useWebSocket(
@@ -68,12 +68,14 @@ const Home = () => {
   return (
     <>
       <Seo title="Whazzapp" />
-      <main className="flex">
+      <main className="flex bg-light">
         <Sidebar />
-        <ChatScreen
-          sendMessage={sendJsonMessage}
-          messageHistory={messageHistory}
-        />
+        {activeChat.length !== 0 && (
+          <ChatScreen
+            sendMessage={sendJsonMessage}
+            messageHistory={messageHistory}
+          />
+        )}
       </main>
     </>
   );

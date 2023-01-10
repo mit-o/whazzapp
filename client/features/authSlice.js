@@ -75,7 +75,7 @@ export const getUser = createAsyncThunk(
       accessToken = state.auth.tokens.access;
     }
     try {
-      const res = await fetch(`${API_BASE_URL}/me/`, {
+      const res = await fetch(`${API_BASE_URL}/users/me/`, {
         method: "GET",
         headers: {
           Accept: "application/json",
@@ -104,8 +104,54 @@ export const getUser = createAsyncThunk(
   }
 );
 
+export const editUser = createAsyncThunk(
+  "auth/editUser",
+  async ({ data, accessToken }, thunkAPI) => {
+    let body;
+    if (data instanceof FormData) {
+      body = data;
+    } else {
+      body = JSON.stringify(data);
+    }
+
+    const headers = {
+      Accept: "application/json",
+      Authorization: `Bearer ${accessToken}`,
+    };
+
+    if (!(data instanceof FormData)) {
+      headers["Content-Type"] = "application/json";
+    }
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/users/me/`, {
+        method: "PATCH",
+        headers,
+        body,
+      });
+
+      const resData = await res.json();
+
+      if (res.status === 200) {
+        return resData;
+      } else if (res.status === 401) {
+        const { dispatch } = thunkAPI;
+        const dispatchRefresh = dispatch(refreshToken());
+        if (dispatchRefresh.fulfilled) {
+          dispatch(editUser());
+        } else {
+          return thunkAPI.rejectWithValue(resData);
+        }
+      } else {
+        return thunkAPI.rejectWithValue(resData);
+      }
+    } catch (err) {
+      return thunkAPI.rejectWithValue(err.response.data);
+    }
+  }
+);
+
 export const logout = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
-  const { dispatch } = thunkAPI;
   const state = thunkAPI.getState();
   const refresh = state.auth.tokens.refresh;
   const body = JSON.stringify({ refresh });
@@ -124,11 +170,9 @@ export const logout = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
     if (res.status === 200) {
       return data;
     } else {
-      dispatch(logout());
       return thunkAPI.rejectWithValue(data);
     }
   } catch (err) {
-    dispatch(logout());
     return thunkAPI.rejectWithValue(err.response.data);
   }
 });
@@ -211,6 +255,16 @@ const authSlice = createSlice({
       .addCase(getUser.rejected, (state) => {
         state.loading = false;
       })
+      .addCase(editUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(editUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(editUser.rejected, (state) => {
+        state.loading = false;
+      })
       .addCase(logout.pending, (state) => {
         state.loading = true;
       })
@@ -222,6 +276,9 @@ const authSlice = createSlice({
       })
       .addCase(logout.rejected, (state) => {
         state.loading = false;
+        state.isAuthenticated = false;
+        state.tokens = null;
+        state.user = null;
       })
       .addCase(refreshToken.pending, (state) => {
         state.loading = true;
