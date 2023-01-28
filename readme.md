@@ -43,14 +43,20 @@
 
 Wazzapp is real time chat application based on Whatsapp and building it was giving and also is giving a lot things to learn and understand.
 
-The most important factors which I have learnt:
+Features:
 
-- Better understanding differences between WebSockets and HTTP Protocols
-- Web socket implementation on both frontend and backend side
-- A lot things to consider about authentication and authorization
-- The difficulties to solve the client and server side rendering
+User registration and login
+Sending messages on private and group conversations
+Ability to edit user profile
+Integration of backend with Firebase SDK for editing and storing user avatars in firebase storage
+Ability to add and remove users from group conversations
+In progress:
 
-This project has still a lot functionalities to add, but I'm working on it.
+Adding message read status
+Connecting SMTP for adding password reminder option
+Listening to message writing
+Pagination and message search
+Tests and CI/CD
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
