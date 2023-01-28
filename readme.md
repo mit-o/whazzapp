@@ -45,18 +45,19 @@ Wazzapp is real time chat application based on Whatsapp and building it was givi
 
 Features:
 
-User registration and login
-Sending messages on private and group conversations
-Ability to edit user profile
-Integration of backend with Firebase SDK for editing and storing user avatars in firebase storage
-Ability to add and remove users from group conversations
+- User registration and login
+- Sending messages on private and group conversations
+- Ability to edit user profile
+- Integration of backend with Firebase SDK for editing and storing user avatars in firebase storage
+- Ability to add and remove users from group conversations
+
 In progress:
 
-Adding message read status
-Connecting SMTP for adding password reminder option
-Listening to message writing
-Pagination and message search
-Tests and CI/CD
+- Adding message read status
+- Connecting SMTP for adding password reminder option
+- Listening to message writing
+- Pagination and message search
+- Tests and CI/CD
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
